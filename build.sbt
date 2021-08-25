@@ -22,5 +22,9 @@ libraryDependencies ++= Seq(
 
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.12.4",
   "io.confluent" % "kafka-json-serializer" % "5.0.1",
-  "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
+  "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar"),
+
+  // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+  "com.google.protobuf" % "protobuf-java" % "3.17.3",
+
 )

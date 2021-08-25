@@ -1,15 +1,12 @@
 import java.io.FileReader
-import java.util.Properties
-import java.util.Optional
-
+import java.util.{Collections, Date, Optional, Properties}
 import org.apache.kafka.clients.producer._
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
 import org.apache.kafka.common.errors.TopicExistsException
-import java.util.Collections
-
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 
+import java.sql.Timestamp
 import scala.util.Try
 
 object Producer extends App {
@@ -29,13 +26,29 @@ object Producer extends App {
     }
   }
 
-  for( i <- 1 to 10) {
-    val countRecord: RecordJSON = new RecordJSON(i)
-    val key: String = "alice"
-    val value: JsonNode = MAPPER.valueToTree(countRecord)
+  val bufferedSource = scala.io.Source.fromFile("src/main/resources/payments_incoming.csv")
+  for (line <- bufferedSource.getLines) {
+    val cols = line.split(",").map(_.trim)
+    // do whatever you want with the columns here
+    println(s"${cols(0)}|${cols(1)}|${cols(2)}")
+    val paymentRecord: PaymentJSON =
+      new PaymentJSON("PAY-" + cols(0), cols(1), getDate(cols(2)))
+    val key: String = "PAY-" + cols(0)
+    val value: JsonNode = MAPPER.valueToTree(paymentRecord)
+      //MAPPER.valueToTree(paymentRecord)
+
     val record = new ProducerRecord[String, JsonNode](topicName, key, value)
     producer.send(record, callback)
   }
+  bufferedSource.close
+
+//  for( i <- 1 to 10) {
+//    val countRecord: RecordJSON = new RecordJSON(i)
+//    val key: String = "alice"
+//    val value: JsonNode = MAPPER.valueToTree(countRecord)
+//    val record = new ProducerRecord[String, JsonNode](topicName, key, value)
+//    producer.send(record, callback)
+//  }
   producer.flush()
   producer.close()
   println("Wrote ten records to " + topicName)
@@ -57,5 +70,13 @@ object Producer extends App {
         if (!e.getCause.isInstanceOf[TopicExistsException]) throw new RuntimeException(e)
     }
     adminClient.close()
+  }
+
+  def getDate(dateString: String): Date = {
+    import java.text.SimpleDateFormat
+    import java.util.Locale
+    val formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH)
+    val date = formatter.parse(dateString)
+    date
   }
 }
