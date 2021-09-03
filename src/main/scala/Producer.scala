@@ -29,8 +29,8 @@ object Producer extends App {
   for (line <- bufferedSource.getLines) {
     val cols = line.split(",").map(_.trim)
     println(s"${cols(0)}|${cols(1)}|${cols(2)}")
-    val paymentRecord: PaymentJSON =
-      new PaymentJSON("PAY-" + cols(0), cols(1), getDate(cols(2)))
+    val paymentRecord: PaymentRecord =
+      new PaymentRecord("PAY-" + cols(0), cols(1), getDate(cols(2)))
     val key: String = "PAY-" + cols(0)
     val value: JsonNode = MAPPER.valueToTree(paymentRecord)
     val record = new ProducerRecord[String, JsonNode](topicName, key, value)
