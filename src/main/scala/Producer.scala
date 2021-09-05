@@ -25,7 +25,7 @@ object Producer extends App {
     }
   }
 
-  val bufferedSource = scala.io.Source.fromFile("src/main/resources/payments_incoming.csv")
+  val bufferedSource = scala.io.Source.fromFile("src/main/resources/payments_incoming_test.csv")
   for (line <- bufferedSource.getLines) {
     val cols = line.split(",").map(_.trim)
     println(s"${cols(0)}|${cols(1)}|${cols(2)}")
